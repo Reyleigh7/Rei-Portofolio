@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home — Portofolio Pribadi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+
+<div id="topbar-root"></div>
+<div class="app-shell">
+  <div id="sidebar-root"></div>
+
+  <main class="main-content">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-text">
+        <div class="hero-greeting" id="heroGreeting">Halo, saya</div>
+        <h1 id="heroName">[NAMA LENGKAP]</h1>
+        <p class="tagline" id="heroTagline">Student • Programmer • Designer • Creative Explorer</p>
+        <p class="desc" id="heroDesc">[Deskripsi singkat tentang dirimu]</p>
+        <div class="hero-actions">
+          <a href="pages/projects.html" class="btn btn-primary">Lihat Projects 🗂️</a>
+          <a href="pages/about.html" class="btn btn-secondary">Tentang Saya 👤</a>
+        </div>
+      </div>
+      <div class="hero-avatar-wrap">
+        <div class="avatar-frame">
+          <img id="heroAvatar" src="assets/img/avatar-placeholder.svg" alt="Foto profil">
+        </div>
+      </div>
+    </section>
+
+    <!-- INFO CARDS -->
+    <section class="section">
+      <div class="grid grid-5" id="infoCards"></div>
+    </section>
+
+    <!-- CURRENTLY LEARNING -->
+    <section class="section">
+      <div class="section-title">
+        <h2>Currently Learning 📚</h2>
+        <a href="pages/learning.html" class="see-all">Lihat semua →</a>
+      </div>
+      <div class="grid grid-4" id="learningCards"></div>
+    </section>
+
+    <!-- FEATURED PROJECTS -->
+    <section class="section">
+      <div class="section-title">
+        <h2>Featured Projects ✨</h2>
+        <a href="pages/projects.html" class="see-all">Lihat semua →</a>
+      </div>
+      <div class="grid grid-4" id="featuredProjects"></div>
+    </section>
+
+    <!-- WHAT I'M WORKING ON + QUICK FACTS -->
+    <section class="section grid grid-2">
+      <div>
+        <div class="section-title"><h2>What I'm Working On 🔧</h2></div>
+        <div id="workingOnList" style="display:flex; flex-direction:column; gap:16px;"></div>
+      </div>
+      <div>
+        <div class="section-title"><h2>Quick Facts ⚡</h2></div>
+        <div class="grid grid-2" id="quickFactsList" style="gap:14px;"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/nav.js"></script>
+<script>
+renderSidebar("home", "");
+
+const d = PORTFOLIO_DATA;
+const p = d.profile;
+
+document.getElementById("heroName").textContent = p.fullName;
+document.getElementById("heroTagline").textContent = p.tagline;
+document.getElementById("heroDesc").textContent = p.homeDescription;
+document.getElementById("heroAvatar").src = p.avatar;
+document.getElementById("heroAvatar").alt = "Foto profil " + p.fullName;
+
+// Info cards row
+const infoCardsData = [
+  { color: "lavender", icon: "👤", title: "About Me", desc: p.shortBio, link: "pages/about.html" },
+  { color: "mint", icon: "🧩", title: "Main Skills", desc: "Python, C++, Blender, Arduino, dan lainnya.", link: "pages/skills.html" },
+  { color: "peach", icon: "🎯", title: "Current Focus", desc: d.currentFocus[0] ? d.currentFocus[0].title : "-", link: "pages/learning.html" },
+  { color: "blue", icon: "🗂️", title: "Projects", desc: d.projects.length + " project telah dibuat.", link: "pages/projects.html" },
+  { color: "pink", icon: "📈", title: "Learning Progress", desc: "Terus belajar hal baru tiap bulan.", link: "pages/learning.html" }
+];
+document.getElementById("infoCards").innerHTML = infoCardsData.map(c => `
+  <a href="${c.link}" class="clay-card c-${c.color}" style="display:block;">
+    <div class="info-card-icon">${c.icon}</div>
+    <h3>${c.title}</h3>
+    <p>${c.desc}</p>
+  </a>
+`).join("");
+
+// Currently learning cards
+const learnColors = ["lavender","mint","blue","peach","coral","yellow","pink","cyan"];
+document.getElementById("learningCards").innerHTML = d.learningProgress.map((l, i) => `
+  <div class="clay-card c-${learnColors[i % learnColors.length]}">
+    <h3>${l.name}</h3>
+    <div class="progress-track" style="margin-top:12px;">
+      <div class="progress-fill f-${l.color}" data-percent="${l.percent}"></div>
+    </div>
+    <p style="margin-top:8px;">${l.percent}% progress</p>
+  </div>
+`).join("");
+
+// Featured projects
+const featured = d.projects.filter(pr => d.featuredProjectSlugs.includes(pr.slug));
+document.getElementById("featuredProjects").innerHTML = featured.map(pr => `
+  <a href="pages/project-detail.html?slug=${pr.slug}" class="clay-card c-${pr.color} project-card" style="text-decoration:none;">
+    <img class="project-thumb" src="${pr.thumbnail}" alt="Thumbnail ${pr.name}">
+    <div class="project-body">
+      <span class="status-badge status-${pr.status.toLowerCase().replace(' ','-')}"><span class="dot"></span>${pr.status}</span>
+      <h3>${pr.name}</h3>
+      <p>${pr.shortDesc}</p>
+    </div>
+  </a>
+`).join("");
+
+// Working on
+const workColors = ["blue","coral","mint","peach"];
+document.getElementById("workingOnList").innerHTML = d.workingOn.map((w, i) => `
+  <div class="clay-card c-${workColors[i % workColors.length]} working-item">
+    <div class="pulse-dot"></div>
+    <div>
+      <h3>${w.title}</h3>
+      <p>${w.desc}</p>
+    </div>
+  </div>
+`).join("");
+
+// Quick facts
+const qfColors = ["lavender","mint","peach","pink"];
+document.getElementById("quickFactsList").innerHTML = d.quickFacts.map((q, i) => `
+  <div class="clay-card c-${qfColors[i % qfColors.length]} quick-fact">
+    <span class="qf-icon">${q.icon}</span>
+    <div>
+      <div class="qf-label">${q.label}</div>
+      <div class="qf-value">${q.value}</div>
+    </div>
+  </div>
+`).join("");
+</script>
+</body>
+</html>
